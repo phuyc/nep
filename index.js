@@ -12,10 +12,11 @@ client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}`)
 })
 
-client.on("messageCreate", (message) => {
-    if (message.content == "hi"){
-        message.reply("Hello World!")
+client.on("messageCreate", msg => {
+    if (msg.content == "p!help" || msg.content == "p!h") {
+        msg.channel.send({ embeds: [help] })
     }
 })
 
-client.login(process.env.TOKEN)
+client.login(process.env.TOKEN);
+keepAlive()
