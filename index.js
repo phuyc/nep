@@ -1,4 +1,7 @@
 const Discord = require("discord.js")
+const keepAlive = require("./server")
+const [ help, profile ] = require("./embeds")
+
 require("dotenv").config()
 
 const client = new Discord.Client({
