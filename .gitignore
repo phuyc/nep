@@ -1,6 +1,8 @@
 .env
 package-lock.json
 node_modules/
+index.js
 server.js
-counterside.js
 embeds.js
+profile.js
+employees.db
