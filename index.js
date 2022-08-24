@@ -11,14 +11,39 @@ const client = new Discord.Client({
     ]
 })
 
+// Run bot
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}`)
 })
 
+//Check messages
 client.on("messageCreate", msg => {
     if (msg.content == "p!help" || msg.content == "p!h") {
         msg.channel.send({ embeds: [help] })
     }
+
+    // Handles p!p and p!profile
+    result1 = /^\bp!p\b/i.exec(msg.content)
+    result2 = /^\bp!profile\b/i.exec(msg.content)
+
+    // p!p
+    if (result1) {
+        let name = msg.content.slice(4);
+        (async () => {
+            embed = await createProfileEmbed(name);
+            msg.channel.send({ embeds: [embed] });
+          })();
+    }
+
+    // p!profile
+    else if (result2) {
+        let name = msg.content.slice(10);
+        (async () => {
+            embed = await createProfileEmbed(name);
+            msg.channel.send({ embeds: [embed] });
+          })();
+    }
+
 })
 
 client.login(process.env.TOKEN);
