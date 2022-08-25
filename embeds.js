@@ -20,5 +20,5 @@ const help = new EmbedBuilder()
 
 
 // Export functions
-module.exports = help
+module.exports = help;
 

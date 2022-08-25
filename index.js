@@ -1,37 +1,47 @@
 const Discord = require("discord.js")
 const keepAlive = require("./server")
-const [ help, profile ] = require("./embeds")
+const help = require("./embeds")
+const { createProfileEmbed, suggest } = require("./profile")
 
 require("dotenv").config()
 
 const client = new Discord.Client({
     intents: [
-        "GUILDS",
-        "GUILD_MESSAGES"
+        Discord.GatewayIntentBits.Guilds,
+        Discord.GatewayIntentBits.GuildMessages,
+        Discord.GatewayIntentBits.MessageContent
     ]
 })
 
 // Run bot
-client.on("ready", () => {
+client.once("ready", () => {
     console.log(`Logged in as ${client.user.tag}`)
 })
 
 //Check messages
 client.on("messageCreate", msg => {
-    if (msg.content == "p!help" || msg.content == "p!h") {
+    if (msg.content === "p!help" || msg.content === "p!h") {
         msg.channel.send({ embeds: [help] })
     }
 
     // Handles p!p and p!profile
-    result1 = /^\bp!p\b/i.exec(msg.content)
-    result2 = /^\bp!profile\b/i.exec(msg.content)
+    let result1 = /^\bp!p\b/i.exec(msg.content)
+    let result2 = /^\bp!profile\b/i.exec(msg.content)
 
     // p!p
     if (result1) {
         let name = msg.content.slice(4);
         (async () => {
-            embed = await createProfileEmbed(name);
-            msg.channel.send({ embeds: [embed] });
+            let embed = await createProfileEmbed(name);
+            if (embed) {
+                msg.channel.send({ embeds: [embed] });
+            }
+            else {
+                let sug = suggest(name);
+                msg.channel.send({
+                    content: sug[0],
+                    components: [sug[1]],
+                })}
           })();
     }
 
@@ -40,6 +50,7 @@ client.on("messageCreate", msg => {
         let name = msg.content.slice(10);
         (async () => {
             embed = await createProfileEmbed(name);
+            if (embed) {
                 msg.channel.send({ embeds: [embed] });
             }
             else {
@@ -54,4 +65,5 @@ client.on("messageCreate", msg => {
 })
 
 client.login(process.env.TOKEN);
+
 keepAlive()
