@@ -40,7 +40,14 @@ client.on("messageCreate", msg => {
         let name = msg.content.slice(10);
         (async () => {
             embed = await createProfileEmbed(name);
-            msg.channel.send({ embeds: [embed] });
+                msg.channel.send({ embeds: [embed] });
+            }
+            else {
+                let suggest = suggest(name);
+                msg.channel.send({
+                    content: suggest[0],
+                    components: [suggest[1]],
+                })}
           })();
     }
 

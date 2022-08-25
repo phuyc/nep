@@ -2,7 +2,7 @@
 package-lock.json
 node_modules/
 index.js
-server.js
 embeds.js
+server.js
 profile.js
 employees.db

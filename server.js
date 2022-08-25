@@ -1,10 +1,14 @@
-const express = require('express');
-const { port } = require('./config.json');
+const express = require("express")
+const server = express()
 
-const app = express();
+server.all("/", (req, res) => {
+	res.send("Bot is running.")
+})
 
-app.get('/', (request, response) => {
-	return response.sendFile('index.html', { root: '.' });
-});
+function keepAlive() {
+	server.listen(3000, () => {
+		console.log("Server is ready.")
+	})
+}
 
-app.listen(port, () => console.log(`App listening at http://localhost:${port}`));
+module.exports = keepAlive
