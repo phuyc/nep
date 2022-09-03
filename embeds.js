@@ -5,17 +5,29 @@ const help = new EmbedBuilder()
         .setColor(0x0099FF)
         .setTitle('List of commands')
         .setDescription('PP help')
-        .setThumbnail('https://i1.sndcdn.com/artworks-000163789531-joeawb-t500x500.jpg')
+        .setThumbnail('https://img-10.stickers.cloud/packs/977bc206-85d3-4882-bd71-a8ab12956a4e/webp/c8bf8419-c2e4-4810-ab71-862dfb67614e.webp')
         .addFields(
-            { name: ':mag: p!p or p!profile', value: 'Looks up an employee\'s profile (add **r** and **a** at the start for Rearm and Awakened). **Example: p!profile rmina**' },
-            { name: ':smirk: p!s or p!skin', value: 'Displays employee\'s skin (default included)' },
-            { name: ':question: p!h or p!help', value: 'Displays this message' },
+            { name: '<:yuna_stare:1015286941761151067> p!p', value: 'Looks up an employee\'s profile (add **a.** at the start for Awakened). **Example: p!p a.mina**' },
+       //   { name: ':smirk: p!s', value: 'Displays employee\'s skin (default included)' }, Coming soon
+            { name: ':ping_pong: p!ping', value: 'Return latency.' },
+            { name: '<:xiao_lin:1015288048851882115> p!h or p!help', value: 'Displays this message' },
+            { name: '<:shadow_overview:1015284890020892672> p!info', value: 'Displays bot info' }
         )
-        .setImage('https://encdn.ldmnq.com/ldstore/ar/sc3DfZ-1653876352710.webp')
+        .setImage('https://i.imgur.com/V6sdSFJ.png')
         .setTimestamp()
         .setFooter({ text: 'nepnep#1358', iconURL: 'https://store.playstation.com/store/api/chihiro/00_09_000/container/BE/nl/19/EP0031-CUSA03124_00-AV00000000000037/image?w=320&h=320&bg_color=000000&opacity=100&_version=00_09_000' });
 
+const credits = new EmbedBuilder()
+            .setColor(0xAE21E8)
+            .setTitle('About')
+            .setThumbnail('https://preview.redd.it/kt3311mn5bp01.png?auto=webp&s=e420455ca8880f533a66514151a197f0f89adce6')
+            .addFields(
+                { name: 'Bot Info', value: 'A bot to look up employees\' information\n**Creator:** nepnep\n**Data provided by:** [Prydwen](https://prydwen.co)\n**Inspired by Hifumin Bot**', inline: true},
+                { name: 'Contact Info', value: '**Discord username:**\nnepnep#1358\n\nCan\'t believe I made this as a final project for my course', inline: true}
+            )
+
+
 
 // Export functions
-module.exports = help;
+module.exports = { help, credits };
 
