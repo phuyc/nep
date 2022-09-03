@@ -3,6 +3,7 @@ const keepAlive = require("./server")
 const { help, credits } = require("./embeds")
 const { createProfileEmbed, suggestMessage, getSlug, rearmSlug } = require("./profile")
 const Database = require("better-sqlite3");
+const { ActivityType } = require("discord.js");
 var Mutex = require('async-mutex').Mutex;
 
 
@@ -28,7 +29,8 @@ const client = new Discord.Client({
 })
 
 // Run bot
-client.once("ready", () => {
+client.on("ready", () => {
+    client.user.setActivity('p!help for commands', { type: ActivityType.Playing })
     console.log(`Logged in as ${client.user.tag}`)
 })
 
@@ -45,15 +47,11 @@ client.on("messageCreate", async msg => {
             break;
 
         // Ping (https://stackoverflow.com/questions/63411268/discord-js-ping-command)
-
-        /*
-        msg.channel.send('Loading data...').then (async (ping) =>{
-            ping.delete()
-            msg.channel.send(`🏓Latency is ${ping.createdTimestamp - msg.createdTimestamp}ms. API Latency is ${Math.round(client.ws.ping)}ms`);
-        })
-        */
         case prefix + 'ping':
-            message.channel.send(`🏓Latency is ${Math.abs(Date.now() - message.createdTimestamp)}ms. API Latency is ${Math.round(client.ws.ping)}ms`)
+            msg.channel.send('Loading data...').then (async (ping) =>{
+                ping.delete()
+                msg.channel.send(`🏓Latency is ${ping.createdTimestamp - msg.createdTimestamp}ms. API Latency is ${Math.round(client.ws.ping)}ms`);
+            })
             break;
         
         // Credits
@@ -64,7 +62,7 @@ client.on("messageCreate", async msg => {
     }
 
     // p!p
-    if (/^\bp!p\b/i.exec(msg.content)) {
+    if (/^\bp!p\b.+/i.exec(msg.content.trim())) {
 
         // Lock
         await mutex.runExclusive(async () => {
