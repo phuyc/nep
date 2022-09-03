@@ -1,14 +1,6 @@
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a name="readme-top"></a>
 
-
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://github.com/phuyc/nep">
-    <img src="https://nitter.net/pic/media%2FFQ2RsUGXEAAmra3.jpg%3Fname%3Dsmall" alt="Logo" width="80" height="80">
-  </a>
-
 <table style="width:100%">
   <tr>
     <td><strong>Prefix:</strong> p!</td>
@@ -17,6 +9,13 @@
       <td><a href="https://discord.com/api/oauth2/authorize?client_id=977387486655414412&permissions=274878254080&scope=bot">Invite Me!</a>       </td>
   </tr>
 </table>
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/phuyc/nep">
+    <img src="https://nitter.net/pic/media%2FFQ2RsUGXEAAmra3.jpg%3Fname%3Dsmall" alt="Logo" width="120" height="120">
+  </a>
 
 <h3 align="center">Nep Bot</h3>
 
@@ -65,8 +64,7 @@ Basically my cs50 final project but I might optimized and maintain it in the fut
 you can invite the bot to your server by the link below:
 [Invite the bot to your server](https://discord.com/api/oauth2/authorize?client_id=977387486655414412&permissions=274878254080&scope=bot)
 
-type p!p (employee's name) to get his/her information, ratings, skills and gear recommendations. Add <br>a.</br> and <br>r.</br> for Awakened and Rearms employees respectively.
-
+type p!p (employee's name) to get his/her information, ratings, skills and gear recommendations. Add <strong>a.</strong> and strong>r.</strong> for Awakened and Rearms employees respectively. Example: <img src='example.jpg' alt='example'>
 _For more information, please invite the bot to your server and text p!help._
 
 
@@ -102,7 +100,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-nepnep - #nepnep1358 - nepnep3114@gmail.com
+nepnep - nepnep#1358 - lhphuc70@gmail.com
 
 Project Link: [https://github.com/phuyc/nep](https://github.com/phuyc/nep)
 
@@ -111,7 +109,7 @@ Project Link: [https://github.com/phuyc/nep](https://github.com/phuyc/nep)
 
 * [Best README Template](https://github.com/othneildrew/Best-README-Template)
 * [Provide data](https://prydwen.co)
-* Inspired by Hifumin Bot
+* Inspired by [Hifumin Bot](https://discord.com/api/oauth2/authorize?client_id=844127991852302386&permissions=2147870784&scope=bot%20applications.commands)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
