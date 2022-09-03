@@ -19,7 +19,11 @@ const ROLES = {
 const TYPES = {
     "counter": "<:type_counter:1009747267466567761> Counter",
     "soldier": "<:type_soldier:1009747270998179890> Soldier",
-    "mech": "<:type_mech:1009747269286899802> Mech"
+    "mech": "<:type_mech:1009747269286899802> Mech",
+    "counter mech": "<:type_counter:1009747267466567761> Counter/<:type_mech:1009747269286899802> Mech",
+    "mech soldier": "<:type_mech:1009747269286899802> Mech/<:type_soldier:1009747270998179890> Soldier",
+    "Counter Corrupted Object": "<:type_counter:1009747267466567761> Counter/<:type_co:1015504113871634472> CO",
+    "Mech Corrupted Object": "<:type_mech:1009747269286899802> Mech/<:type_co:1015504113871634472> CO"
 }
 
 const RATINGS = {
@@ -30,17 +34,40 @@ const RATINGS = {
     "S": "<:S_:1009868791548760205>",
     "SS": "<:SS:1009868793016750192>",
     "SSS": "<:SSS:1009868795243929600>"
-        
+}
+
+const REARMS = {
+    'r.mina': 'expert-mercenary-yoo-mina',
+    'r.yoo mina': 'expert-mercenary-yoo-mina',
+    'r.xiao': 'xiao',
+    'r.irie': 'best-mascot-irie',
+    'r.elizabeth': 'blue-blood-elizabeth',
+    'r.esterosa': 'near-astraea-esterosa',
+    'r.eujin': 'agent-eujin',
+    'r.orca': 'abyssal-ravage-orca',
+    'r.miya': 'best-streamer-miya',
+    'r.kang': 'investigator-kang',
+    'r.sylvia': 'dark-seven-sylvia',
+    'r.sorim': 'special-forces-han-sorim',
+    'r.han sorim': 'special-forces-han-sorim',
+    'r.titan':  'triana-titan'
 }
 
 // Declare variables
 let res, text, data, sdv, avatar, picture, img, ratings, skillBox, gear;
 
+
+// Is rearm
+function rearmSlug(name) {
+    return REARMS[name] ?? name;
+}
+
+
 // Create profile embed
 async function createProfileEmbed(name) {
 
     // Fetch profile from prydwen.co
-    res = await fetch(`https://prydwen.co/employees/${name.trim().replace(" ", "-").toLowerCase()}`);
+    res = await fetch(`https://prydwen.co/employees/${name.trim().replace(/ /g, "-").toLowerCase()}`);
 
     // Handle error
     if (res.status != 200) {
@@ -164,7 +191,7 @@ async function createProfileEmbed(name) {
     return profile;
 }
 
-
+// Suggest
 function suggest(name, db) {
 
     // Capitalize name
@@ -235,5 +262,7 @@ function getSlug(name, db) {
     return slug['slug'] ?? name.trim().replace(" ", "-").toLowerCase();
 }
 
+
+
 // Export
-module.exports = { createProfileEmbed, suggestMessage, getSlug };
+module.exports = { createProfileEmbed, suggestMessage, getSlug, rearmSlug };
