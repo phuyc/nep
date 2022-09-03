@@ -55,7 +55,7 @@
 
 Basically my cs50 final project but I might optimized and maintain it in the future.
 
-# Permissions
+#### Permissions
 
 <strong>Read Messages (required)</strong>: Allows bot to read messages to find those with prefix.<br>
 <strong>Send Messages (required)</strong>: Allows bot to reply to said messages.<br>
