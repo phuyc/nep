@@ -7,9 +7,9 @@ const help = new EmbedBuilder()
         .setDescription('PP help')
         .setThumbnail('https://img-10.stickers.cloud/packs/977bc206-85d3-4882-bd71-a8ab12956a4e/webp/c8bf8419-c2e4-4810-ab71-862dfb67614e.webp')
         .addFields(
-            { name: '<:yuna_stare:1015286941761151067> p!p', value: 'Looks up an employee\'s profile (add **a.** at the start for Awakened). **Example: p!p a.mina**' },
+            { name: '<:yuna_stare:1015286941761151067> p!p', value: 'Looks up an employee\'s profile (add **a.** and **r.** at the start for Awakeneds and Rearms). **Example: p!p a.shin jia**' },
        //   { name: ':smirk: p!s', value: 'Displays employee\'s skin (default included)' }, Coming soon
-            { name: ':ping_pong: p!ping', value: 'Return latency.' },
+            { name: '🏓 p!ping', value: 'Return latency.' },
             { name: '<:xiao_lin:1015288048851882115> p!h or p!help', value: 'Displays this message' },
             { name: '<:shadow_overview:1015284890020892672> p!info', value: 'Displays bot info' }
         )
