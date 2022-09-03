@@ -1,8 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
 
-// TODO: Add a suggestion when client type a wrong name
-// TODO: Handles employees with only 2 ratings
-
 // Help
 const help = new EmbedBuilder()
         .setColor(0x0099FF)
