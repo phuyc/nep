@@ -57,11 +57,11 @@ Basically my cs50 final project but I might optimized and maintain it in the fut
 
 # Permissions
 
-<strong>Read Messages (required)</strong>: Allows bot to read messages to find those with prefix.
-<strong>Send Messages (required)</strong>: Allows bot to reply to said messages.
-<strong>Embed links (required)</strong>: Most of the commands send an embed. I guess you can turn it off and only use p!ping. 
-<strong>Send Messages in Threads</strong>: Allows bot to reply to said messages (surprised surprised) in threads. Can disable but it will not work in threads.
-<strong>Use External Emoji<strong>: Self-explained. the embeds will just look uglier if you disable this.
+<strong>Read Messages (required)</strong>: Allows bot to read messages to find those with prefix.<br>
+<strong>Send Messages (required)</strong>: Allows bot to reply to said messages.<br>
+<strong>Embed links (required)</strong>: Most of the commands send an embed. I guess you can turn it off and only use p!ping. <br>
+<strong>Send Messages in Threads</strong>: Allows bot to reply to said messages (surprised surprised) in threads. Can disable but it will not work in threads.<br>
+<strong>Use External Emoji<strong>: Self-explained. the embeds will just look uglier if you disable this.<br>
 
 <!-- USAGE EXAMPLES -->
 ## Usage
