@@ -1,7 +1,7 @@
 const Discord = require("discord.js")
 const keepAlive = require("./server")
 const { help, credits } = require("./embeds")
-const { createProfileEmbed, suggestMessage, getSlug } = require("./profile")
+const { createProfileEmbed, suggestMessage, getSlug, rearmSlug } = require("./profile")
 const Database = require("better-sqlite3");
 var Mutex = require('async-mutex').Mutex;
 
@@ -10,7 +10,7 @@ var Mutex = require('async-mutex').Mutex;
 const mutex = new Mutex();
 
 // Declare variables
-let name, embed, suggests, message, profile, wait1, wait2, messages;
+let name, embed, suggests, message, profile, wait1, wait2, messages, ar;
 const timeout = {};
 let prefix = 'p!';
 
@@ -45,11 +45,15 @@ client.on("messageCreate", async msg => {
             break;
 
         // Ping (https://stackoverflow.com/questions/63411268/discord-js-ping-command)
+
+        /*
+        msg.channel.send('Loading data...').then (async (ping) =>{
+            ping.delete()
+            msg.channel.send(`🏓Latency is ${ping.createdTimestamp - msg.createdTimestamp}ms. API Latency is ${Math.round(client.ws.ping)}ms`);
+        })
+        */
         case prefix + 'ping':
-            msg.channel.send('Loading data...').then (async (ping) =>{
-                ping.delete()
-                msg.channel.send(`🏓Latency is ${ping.createdTimestamp - msg.createdTimestamp}ms. API Latency is ${Math.round(client.ws.ping)}ms`);
-            })
+            message.channel.send(`🏓Latency is ${Math.abs(Date.now() - message.createdTimestamp)}ms. API Latency is ${Math.round(client.ws.ping)}ms`)
             break;
         
         // Credits
@@ -67,10 +71,19 @@ client.on("messageCreate", async msg => {
             // Get name
             name = msg.content.slice(4);
 
+            // ar
+            ar = name.slice(0, 2).toLowerCase();
+
             // Check for awakeneds
-            if (name.slice(0, 2).toLowerCase() === 'a.') {
-                name = 'Awakened ' + name[2].toUpperCase + name.slice(3); 
+            if (ar === 'a.') {
+                name = 'Awakened ' + name.slice(2);
+            };
+
+            // Check for rearms
+            if (ar === 'r.') {
+                name = rearmSlug(name);
             }
+
             // Send wait
             wait1 = await msg.channel.send("Please wait...");
 
@@ -88,7 +101,7 @@ client.on("messageCreate", async msg => {
                     components: [suggests[1]],
                 })
                 // Store the message's id in an object to access it later in interactionCreate and delete it after
-                .then( sent => { timeout[sent.id] = setTimeout(() => {sent.delete(); delete timeout[sent.id]}, 8000) })
+                .then( sent => { timeout[sent.id] = setTimeout(() => {sent.delete(); delete timeout[sent.id]}, 10000) })
             }
 
             // Delete wait
