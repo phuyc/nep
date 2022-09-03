@@ -1,7 +1,21 @@
 const Discord = require("discord.js")
 const keepAlive = require("./server")
-const help = require("./embeds")
-const { createProfileEmbed, suggest } = require("./profile")
+const { help, credits } = require("./embeds")
+const { createProfileEmbed, suggestMessage, getSlug } = require("./profile")
+const Database = require("better-sqlite3");
+var Mutex = require('async-mutex').Mutex;
+
+
+// Mutex
+const mutex = new Mutex();
+
+// Declare variables
+let name, embed, suggests, message, profile, wait1, wait2, messages;
+const timeout = {};
+let prefix = 'p!';
+
+// Open db
+const db = new Database("./employees.db");
 
 require("dotenv").config()
 
@@ -19,51 +33,99 @@ client.once("ready", () => {
 })
 
 //Check messages
-client.on("messageCreate", msg => {
-    if (msg.content === "p!help" || msg.content === "p!h") {
-        msg.channel.send({ embeds: [help] })
-    }
+client.on("messageCreate", async msg => {
+    if (msg.author.id == '977387486655414412') return;
 
-    // Handles p!p and p!profile
-    let result1 = /^\bp!p\b/i.exec(msg.content)
-    let result2 = /^\bp!profile\b/i.exec(msg.content)
+    switch (msg.content) {
+
+        // Help
+        case prefix + "help":
+        case prefix + 'h':
+            msg.channel.send({ embeds: [help] });
+            break;
+
+        // Ping (https://stackoverflow.com/questions/63411268/discord-js-ping-command)
+        case prefix + 'ping':
+            msg.channel.send('Loading data...').then (async (ping) =>{
+                ping.delete()
+                msg.channel.send(`🏓Latency is ${ping.createdTimestamp - msg.createdTimestamp}ms. API Latency is ${Math.round(client.ws.ping)}ms`);
+            })
+            break;
+        
+        // Credits
+        case prefix + 'i':
+        case prefix + 'info':
+            msg.channel.send({ embeds: [credits] });
+            break;
+    }
 
     // p!p
-    if (result1) {
-        let name = msg.content.slice(4);
-        (async () => {
-            let embed = await createProfileEmbed(name);
-            if (embed) {
-                msg.channel.send({ embeds: [embed] });
-            }
-            else {
-                let sug = suggest(name);
-                msg.channel.send({
-                    content: sug[0],
-                    components: [sug[1]],
-                })}
-          })();
-    }
+    if (/^\bp!p\b/i.exec(msg.content)) {
 
-    // p!profile
-    else if (result2) {
-        let name = msg.content.slice(10);
-        (async () => {
+        // Lock
+        await mutex.runExclusive(async () => {
+            // Get name
+            name = msg.content.slice(4);
+
+            // Check for awakeneds
+            if (name.slice(0, 2).toLowerCase() === 'a.') {
+                name = 'Awakened ' + name[2].toUpperCase + name.slice(3); 
+            }
+            // Send wait
+            wait1 = await msg.channel.send("Please wait...");
+
+            // Create and send profile embed if found
             embed = await createProfileEmbed(name);
             if (embed) {
                 msg.channel.send({ embeds: [embed] });
             }
-            else {
-                let suggest = suggest(name);
-                msg.channel.send({
-                    content: suggest[0],
-                    components: [suggest[1]],
-                })}
-          })();
-    }
 
-})
+            // send suggestions if not found and delete it after 8 seconds 
+            else {
+                suggests = suggestMessage(name, db);
+                msg.channel.send({
+                    content: suggests[0],
+                    components: [suggests[1]],
+                })
+                // Store the message's id in an object to access it later in interactionCreate and delete it after
+                .then( sent => { timeout[sent.id] = setTimeout(() => {sent.delete(); delete timeout[sent.id]}, 8000) })
+            }
+
+            // Delete wait
+            wait1.delete();
+        });
+    };
+});
+
+
+client.on('interactionCreate', async interaction => {
+	if (interaction.isButton) {
+        await mutex.runExclusive(async () => {
+            // Search for newline   
+            messages = interaction.message.content.slice(3).match(/^(.*)$/gm);
+
+            // clear timeout and delete message's id
+            clearTimeout(timeout[interaction.message.id]);
+            delete timeout[interaction.message.id];
+
+            // Send wait and delete suggestions
+            interaction.message.delete();
+            wait2 = await interaction.channel.send("Please wait...");
+            
+            // Get the part that matters
+            message = messages[interaction.customId].slice(3);
+
+            // Send profile embed
+            profile = await createProfileEmbed(getSlug(message, db));
+            interaction.channel.send({ embeds: [profile] });
+
+            // Delete wait
+            wait2.delete();
+        });
+    };
+});
+
 
 client.login(process.env.TOKEN);
 
-keepAlive()
+keepAlive();
