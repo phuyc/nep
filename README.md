@@ -69,7 +69,9 @@ Basically my cs50 final project but I might optimized and maintain it in the fut
 you can invite the bot to your server by the link below:
 [Invite the bot to your server](https://discord.com/api/oauth2/authorize?client_id=977387486655414412&permissions=274878254080&scope=bot)
 
-type p!p (employee's name) to get his/her information, ratings, skills and gear recommendations. Add <strong>a.</strong> and <strong>r.</strong> for Awakened and Rearms employees respectively. Example: <img src='images/example.jpg' alt='example'>
+type p!p (employee's name) to get his/her information, ratings, skills and gear recommendations. Add <strong>a.</strong> and <strong>r.</strong> for Awakened and Rearms employees respectively. Example:
+<br>
+<img src='images/example.jpg' alt='example'>
 <br>
 _For more information, please invite the bot to your server and text p!help._
 
