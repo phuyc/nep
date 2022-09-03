@@ -4,101 +4,75 @@ const fetch = require("node-fetch");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const stringSimilarity = require("string-similarity")
-const Database = require("better-sqlite3");
+
+// Object to use instead of if...else/switch
+const ROLES = {
+    "striker": "<:role_striker:1009747263528116334> Striker",
+    "sniper": "<:role_sniper:1009747261682614382> Sniper",
+    "ranger": "<:role_ranger:1009747273019830322> Ranger",
+    "defender": "<:role_defender:1009746831372202014> Defender",
+    "supporter":"<:role_support:1009747241751302344> Supporter",
+    "siege": "<:role_siege:1009747259405115423> Siege",
+    "tower": "<:role_tower:1009747265667223592> Tower"
+}
+
+const TYPES = {
+    "counter": "<:type_counter:1009747267466567761> Counter",
+    "soldier": "<:type_soldier:1009747270998179890> Soldier",
+    "mech": "<:type_mech:1009747269286899802> Mech"
+}
+
+const RATINGS = {
+    "D": "<:D_:1009868758908674108>",
+    "C": "<:C_:1009868756752797717>",
+    "B": "<:B_:1009868754831822920>",
+    "A": "<:A_:1009868760603164796>",
+    "S": "<:S_:1009868791548760205>",
+    "SS": "<:SS:1009868793016750192>",
+    "SSS": "<:SSS:1009868795243929600>"
+        
+}
+
+// Declare variables
+let res, text, data, sdv, avatar, picture, img, ratings, skillBox, gear;
 
 // Create profile embed
 async function createProfileEmbed(name) {
-    
+
     // Fetch profile from prydwen.co
-    let res = await fetch(`https://prydwen.co/employees/${name.trim().replace(" ", "-").toLowerCase()}`);
+    res = await fetch(`https://prydwen.co/employees/${name.trim().replace(" ", "-").toLowerCase()}`);
 
     // Handle error
     if (res.status != 200) {
         return;
     }
 
-    let text = await res.text();
-    let data = new JSDOM(text);
+    text = await res.text();
+    data = new JSDOM(text);
 
     // Extract details from profile
     data.window.document.querySelectorAll('script').forEach(s => s.remove());
-    let sdv = data.window.document.querySelectorAll(".single-detail-value");
+    sdv = data.window.document.querySelectorAll(".single-detail-value");
 
-    // Add emojis to role
-    switch (sdv[5].textContent.trim().toLowerCase()) {
-        case "striker":
-            sdv[5].textContent = "<:role_striker:1009747263528116334> Striker";
-            break;
-        case "sniper":
-            sdv[5].textContent = "<:role_sniper:1009747261682614382> Sniper";
-            break;
-        case "ranger":
-            sdv[5].textContent = "<:role_ranger:1009747273019830322> Ranger";
-            break;
-        case "defender":
-            sdv[5].textContent = "<:role_defender:1009746831372202014> Defender";
-            break;
-        case "supporter":
-            sdv[5].textContent = "<:role_support:1009747241751302344> Supporter";
-            break;
-        case "siege":
-            sdv[5].textContent = "<:role_siege:1009747259405115423> Siege";
-            break;
-        case "tower":
-            sdv[5].textContent = "<:role_tower:1009747265667223592> Tower";
-            break;
-    }
-
-    // Add emojis to type
-    switch (sdv[6].textContent.trim().toLowerCase()) {
-        case "counter":
-            sdv[6].textContent = "<:type_counter:1009747267466567761> Counter";
-            break;
-        case "soldier":
-            sdv[6].textContent = "<:type_soldier:1009747270998179890> Soldier";
-            break;
-        case "mech":
-            sdv[6].textContent = "<:type_mech:1009747269286899802> Mech";
-            break;
-    }
+    // Add emojis to role and type
+    sdv[5].textContent = ROLES[sdv[5].textContent.toLowerCase().trim()] ?? sdv[5].textContent;
+    sdv[6].textContent = TYPES[sdv[6].textContent.toLowerCase().trim()] ?? sdv[6].textContent;
 
     // Extract avatar from profile
-    let avatar = data.window.document.querySelector(".avatar");
-    let picture = avatar.querySelector("picture");
-    let img = picture.querySelector("img").getAttribute('data-src');
+    avatar = data.window.document.querySelector(".avatar");
+    picture = avatar.querySelector("picture");
+    img = picture.querySelector("img").getAttribute('data-src');
 
     // Extract ratings from profile
-    let ratings = data.window.document.querySelectorAll(".unit-header .rating")
+    ratings = data.window.document.querySelectorAll(".unit-header .rating");
 
     // Convert ratings to emoji
     for (let rating of ratings) {
-        switch (rating.textContent) {
-            case "D":
-                rating.textContent = "<:D_:1009868758908674108>";
-                break;
-            case "C":
-                rating.textContent = "<:C_:1009868756752797717>";
-                break;
-            case "B":
-                rating.textContent = "<:B_:1009868754831822920>";
-                break;
-            case "A":
-                rating.textContent = "<:A_:1009868760603164796>";
-                break;
-            case "S":
-                rating.textContent = "<:S_:1009868791548760205>";
-                break;    
-            case "SS":
-                rating.textContent = "<:SS:1009868793016750192>";
-                break;
-            case "SSS":
-                rating.textContent = "<:SSS:1009868795243929600>";
-                break;
-        }
-    }
+        rating.textContent = RATINGS[rating.textContent];
+    };
 
     // Extract skills from profile
-    let skillBox = data.window.document.querySelectorAll(".skill-box");
+    skillBox = data.window.document.querySelectorAll(".skill-box");
     const skillNames = [];
     const skillTypes = [];
     const skillAttackCount = [];
@@ -114,7 +88,7 @@ async function createProfileEmbed(name) {
     }
 
     //Extract gear rec
-    let gear = data.window.document.querySelectorAll(".set span");
+    gear = data.window.document.querySelectorAll(".set span");
 
 
     // Create embed
@@ -191,25 +165,21 @@ async function createProfileEmbed(name) {
 }
 
 
-function suggest(name) {
+function suggest(name, db) {
 
     // Capitalize name
-    name = name.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
+    if (typeof(name) != 'string') return;
+    
+        name = name.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
 
     // Array of employees' name
     const names = [];
-
-    // Open db
-    const db = new Database("./employees.db");
 
     // Populate array
     let aliases = db.prepare("SELECT name FROM employees;").all();
     for (let alias of aliases) {
         names.push(alias['name']);
     };
-
-    // Close db
-    db.close()
 
     // Rate similarity
     let matches = stringSimilarity.findBestMatch(name, names).ratings;
@@ -221,26 +191,49 @@ function suggest(name) {
 
     // Pick the best 3
     matches.length = 3;
+    
+    // Return
+    return matches;
+}
 
-    let suggestion = `Did you mean:\n:one: ${matches[0].target}\n:two: ${matches[1].target}\n:three: ${matches[2].target}`
+
+function suggestMessage(name, db) {
+    // Get suggestions
+    let matches = suggest(name, db);
+
+    //Create components for suggestion message
+    let suggestion = `Did you mean:\n1. ${matches[0].target}\n2. ${matches[1].target}\n3. ${matches[2].target}`;
     let row = new ActionRowBuilder()
     .addComponents(
+        // 1
         new ButtonBuilder()
             .setCustomId('1')
             .setLabel(`1`)
             .setStyle(ButtonStyle.Primary),
+        // 2
         new ButtonBuilder()
             .setCustomId('2')
             .setLabel(`2`)
             .setStyle(ButtonStyle.Primary),
+        // 3
         new ButtonBuilder()
             .setCustomId('3')
             .setLabel(`3`)
             .setStyle(ButtonStyle.Primary),
-    )
+    );
 
+    // Return
     return [suggestion, row];
 }
 
+
+// Get slug
+function getSlug(name, db) {
+    let slug = db.prepare("SELECT slug FROM employees WHERE name=?;").get(name);
+    
+    // Return slug if found and the default if not found
+    return slug['slug'] ?? name.trim().replace(" ", "-").toLowerCase();
+}
+
 // Export
-module.exports = { createProfileEmbed, suggest };
+module.exports = { createProfileEmbed, suggestMessage, getSlug };
