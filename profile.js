@@ -7,23 +7,23 @@ const stringSimilarity = require("string-similarity")
 
 // Object to use instead of if...else/switch
 const ROLES = {
-    "striker": "<:role_striker:1009747263528116334> Striker",
-    "sniper": "<:role_sniper:1009747261682614382> Sniper",
-    "ranger": "<:role_ranger:1009747273019830322> Ranger",
-    "defender": "<:role_defender:1009746831372202014> Defender",
-    "supporter":"<:role_support:1009747241751302344> Supporter",
-    "siege": "<:role_siege:1009747259405115423> Siege",
-    "tower": "<:role_tower:1009747265667223592> Tower"
+    "Striker": "<:role_striker:1009747263528116334> Striker",
+    "Sniper": "<:role_sniper:1009747261682614382> Sniper",
+    "Ranger": "<:role_ranger:1009747273019830322> Ranger",
+    "Defender": "<:role_defender:1009746831372202014> Defender",
+    "Supporter":"<:role_support:1009747241751302344> Supporter",
+    "Siege": "<:role_siege:1009747259405115423> Siege",
+    "Tower": "<:role_tower:1009747265667223592> Tower"
 }
 
 const TYPES = {
-    "counter": "<:type_counter:1009747267466567761> Counter",
-    "soldier": "<:type_soldier:1009747270998179890> Soldier",
-    "mech": "<:type_mech:1009747269286899802> Mech",
-    "counter mech": "<:type_counter:1009747267466567761> Counter/<:type_mech:1009747269286899802> Mech",
-    "mech soldier": "<:type_mech:1009747269286899802> Mech/<:type_soldier:1009747270998179890> Soldier",
-    "Counter Corrupted Object": "<:type_counter:1009747267466567761> Counter/<:type_co:1015504113871634472> CO",
-    "Mech Corrupted Object": "<:type_mech:1009747269286899802> Mech/<:type_co:1015504113871634472> CO"
+    "Counter": "<:type_counter:1009747267466567761> Counter",
+    "Soldier": "<:type_soldier:1009747270998179890> Soldier",
+    "Mech": "<:type_mech:1009747269286899802> Mech",
+    "MechCounter": "<:type_counter:1009747267466567761> Counter <:type_mech:1009747269286899802> Mech",
+    "SoldierMech": "<:type_mech:1009747269286899802> Mech <:type_soldier:1009747270998179890> Soldier",
+    "CounterCorrupted Object": "<:type_counter:1009747267466567761> Counter <:type_co:1015504113871634472> CO",
+    "MechCorrupted Object": "<:type_mech:1009747269286899802> Mech <:type_co:1015504113871634472> CO"
 }
 
 const RATINGS = {
@@ -54,7 +54,7 @@ const REARMS = {
 }
 
 // Declare variables
-let res, text, data, sdv, avatar, picture, img, ratings, skillBox, gear;
+let res, json, skillEmbed, ten = '';
 
 
 // Is rearm
@@ -62,110 +62,88 @@ function rearmSlug(name) {
     return REARMS[name] ?? name;
 }
 
-
-// Create profile embed
 async function createProfileEmbed(name) {
 
+    if (name.trim().toLowerCase() === 'best girl') {
+        name = "Naielle Bluesteel";
+    }
+
     // Fetch profile from prydwen.co
-    res = await fetch(`https://prydwen.co/employees/${name.trim().replace(/ /g, "-").toLowerCase()}`);
+    res = await fetch(`https://www.prydwen.co/page-data/employees/${name.trim().replace(/ /g, "-").toLowerCase()}/page-data.json`);
 
     // Handle error
     if (res.status != 200) {
         return;
     }
 
-    text = await res.text();
-    data = new JSDOM(text);
+    // JSON
+    json = await res.json();
+    json = json.result.data.currentUnit.nodes[0];
 
-    // Extract details from profile
-    data.window.document.querySelectorAll('script').forEach(s => s.remove());
-    sdv = data.window.document.querySelectorAll(".single-detail-value");
-
-    // Add emojis to role and type
-    sdv[5].textContent = ROLES[sdv[5].textContent.toLowerCase().trim()] ?? sdv[5].textContent;
-    sdv[6].textContent = TYPES[sdv[6].textContent.toLowerCase().trim()] ?? sdv[6].textContent;
-
-    // Extract avatar from profile
-    avatar = data.window.document.querySelector(".avatar");
-    picture = avatar.querySelector("picture");
-    img = picture.querySelector("img").getAttribute('data-src');
-
-    // Extract ratings from profile
-    ratings = data.window.document.querySelectorAll(".unit-header .rating");
-
-    // Convert ratings to emoji
-    for (let rating of ratings) {
-        rating.textContent = RATINGS[rating.textContent];
-    };
-
-    // Extract skills from profile
-    skillBox = data.window.document.querySelectorAll(".skill-box");
-    const skillNames = [];
-    const skillTypes = [];
-    const skillAttackCount = [];
-    const skillCooldown = [];
-    const skillDescription = [];
-    let skillEmbed = "";
-    for (skill of skillBox) {
-        skillNames.push(skill.querySelector(".skill-name"));
-        skillTypes.push(skill.querySelector(".skill-type"));
-        skillAttackCount.push(skill.querySelector(".attack-count"))
-        skillCooldown.push(skill.querySelector(".cooldown"))
-        skillDescription.push(skill.querySelector(".skill-description"))
+    // For units that has 2 types
+    if (json.type.length == 2) {
+        json.type[0] = json.type[0] + json.type[1];
     }
 
-    //Extract gear rec
-    gear = data.window.document.querySelectorAll(".set span");
+    // Skills and lvl5/10
+    base = json.skills.filter(s => s.level == 1)
+    five = json.skills.filter(s => s.level == 5)
 
+    if (json.isRearmed) {
+        ten = json.skills.filter(s => s.level == 10)
+    }
 
     // Create embed
     let profile = new EmbedBuilder()
-    .setTitle(`[${sdv[4].textContent}] ${sdv[1].textContent}`)
-    .setDescription(sdv[0].textContent)
-    .setThumbnail(`https://prydwen.co${img}`)
+    .setTitle(`[${json.rarity}] ${json.fullName}`)
+    .setDescription(`#${json.unitId}`)
+    .setThumbnail(`https://prydwen.co${json.smallAvatar.localFile.childImageSharp.gatsbyImageData.images.fallback.src}`)
     .setColor(0x0099FF)
     .addFields(
 
         // Field 1.1 (Details left)
-        { name: 'DETAILS', value: `**Faction**: ${sdv[3].textContent}\n**Role**:  ${sdv[5].textContent}\n**Move.type**: ${sdv[8].textContent}`, inline: true },        
+        { name: 'DETAILS', value: `**Faction**: ${json.title}\n**Role**:  ${ROLES[json.role] ?? json.role}\n**Move.type**: ${json.movementType}`, inline: true },        
         
         // Field 1.2 (Details right)                            
-        { name: '\u200b', value: `**Deployment cost**: ${sdv[7].textContent}\n**Type**: ${sdv[6].textContent}\n**Att.type**: ${sdv[9].textContent}`, inline: true })
+        { name: '\u200b', value: `**Deployment cost**: ${json.cost}\n**Type**: ${TYPES[json.type[0]] ?? json.type[0]}\n**Att.type**: ${json.attackType}`, inline: true })
         
-    // Field 2 (PVE Rating)
+        // Field 2 (PVE Rating)     
+        if (!json.isRatingPending) {                
+            profile.addFields({ name: 'RATINGS', value: `**PVE**: ${RATINGS[json.ratingOverallPVETier] ?? json.ratingOverallPVETier}` + ' ' + `**PVP (SEA)**: ${RATINGS[json.ratingOverallPVPTier] ?? json.ratingOverallPVPTier}` + '  ' + `**PVP (Global)**: ${RATINGS[json.ratingGlobalPvpTier] ?? json.ratingGlobalPvpTier}`})
+        } else {
+            profile.addFields({ name: 'RATINGS', value: `**PVE**: ?` + ' ' + `**PVP (SEA)**: ?` + '  ' + `**PVP (Global)**: ?`})
+        }
 
-    // If employee has Global PVP rating                           
-    if (ratings.length == 3) {
-        profile.addFields({ name: 'RATINGS', value: `**PVE**: ${ratings[0].textContent}` + '  ' + `**PVP (SEA)**: ${ratings[1].textContent}` + '  ' + `**PVP (Global)**: ${ratings[2].textContent}`})
-    }
-    // Else
-    else if (ratings.length == 2) {
-        profile.addFields({ name: 'RATINGS', value: `**PVE**: ${ratings[0].textContent}` + '  ' + `**PVP (SEA)**: ${ratings[1].textContent}` + '  ' +  `**PVP (Global)**: ?`})
-    }
-    else if (ratings.length == 0) {
-        profile.addFields({ name: 'RATINGS', value: `**PVE**: ?` + '  ' + `**PVP (SEA)**: ?` + '  ' +  `**PVP (GLB)**: ?`})
-    };
 
     // Create skill field for every skillBox
-    for (let i = 0; i < skillBox.length;i++) {
+    for (let i = 0; i < base.length; i++) {
         
         // Add skill's type and name
-        skillEmbed += `**${skillTypes[i].textContent}: ${skillNames[i].textContent}** `;
+        skillEmbed += `**${base[i].type}: ${base[i].fullName}**`;
         
         // Check for valid hit
-        if (skillAttackCount[i]) {
-            skillEmbed += ` \`${skillAttackCount[i].textContent}\``;
+        if (base[i].attackCount) {
+            skillEmbed += ` \`${base[i].attackCount} valid hits\``;
         };
         
         // Check for cooldown
-        if (skillCooldown[i]) {
-            skillEmbed += ` \`${skillCooldown[i].textContent.trim()}\``;
+        if (base[i].cooldownSecs) {
+            skillEmbed += ` \`${base[i].cooldownSecs} seconds\``;
         };
 
         // Add skill description
-        skillEmbed += `\n\`\`\`${skillDescription[i].textContent}\`\`\``;
-        
-        //create embed field 3.i (Skills)
+        skillEmbed += `\n\`\`\`${base[i].description.description}\`\`\``;
+
+        // Add level 5
+        skillEmbed += `\`\`\`At level 5: ${five[i].description.description}\`\`\``;
+
+        // Add level 10
+        if (json.isRearmed) {
+            if (ten.length > i) {
+                skillEmbed += `\`\`\`At level 10: ${ten[i].description.description}\`\`\``;
+        }}
+
+        // Create embed field 3.i (Skills)
         if (i==0) {
             // Only the first field has name
             profile.addFields({ name: 'SKILLS', value: skillEmbed });
@@ -174,15 +152,17 @@ async function createProfileEmbed(name) {
             profile.addFields({ name: '\u200b', value: skillEmbed })
         };
         skillEmbed = '';
-}
+    }
 
-    // Field 4 (gear recommendation)
-    profile.addFields(
-        { name: "GEAR RECOMMENDATION", value: `PVE: \`${gear[0].textContent}\`\nPVP: \`${gear[1].textContent}\``}
-    )
+    // Create embed field 4 (Gear rec)
+    if (json.gearRecommendation) {
+        profile.addFields(
+            { name: "GEAR RECOMMENDATION", value: `PVE: \`${json.gearRecommendation.pve.set}\`\nPVP: \`${json.gearRecommendation.pvp.set}\`
+            \n**[Find out more](https://prydwen.co/${name.trim().replace(/ /g, "-").toLowerCase()})**`});
+    }
 
     // Timestamp
-    .setTimestamp()
+    profile.setTimestamp()
 
     // Footer
     .setFooter({ text: 'nepnep#1358', iconURL: 'https://store.playstation.com/store/api/chihiro/00_09_000/container/BE/nl/19/EP0031-CUSA03124_00-AV00000000000037/image?w=320&h=320&bg_color=000000&opacity=100&_version=00_09_000' });
@@ -190,6 +170,7 @@ async function createProfileEmbed(name) {
     // Return
     return profile;
 }
+
 
 // Suggest
 function suggest(name, db) {
@@ -228,7 +209,7 @@ function suggestMessage(name, db) {
     // Get suggestions
     let matches = suggest(name, db);
 
-    //Create components for suggestion message
+    // Create components for suggestion message
     let suggestion = `Did you mean:\n1. ${matches[0].target}\n2. ${matches[1].target}\n3. ${matches[2].target}`;
     let row = new ActionRowBuilder()
     .addComponents(
