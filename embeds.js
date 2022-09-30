@@ -8,6 +8,7 @@ const help = new EmbedBuilder()
         .setThumbnail('https://img-10.stickers.cloud/packs/977bc206-85d3-4882-bd71-a8ab12956a4e/webp/c8bf8419-c2e4-4810-ab71-862dfb67614e.webp')
         .addFields(
             { name: '<:yuna_stare:1015286941761151067> p!p', value: 'Looks up an employee\'s profile (add **a.** and **r.** at the start for Awakeneds and Rearms). **Example: p!p a.shin jia**' },
+            { name: '<:momo:1024286695211933766> p!o', value: 'Looks up an operators\'s profile'},
        //   { name: ':smirk: p!s', value: 'Displays employee\'s skin (default included)' }, Coming soon
             { name: '🏓 p!ping', value: 'Return latency.' },
             { name: '<:xiao_lin:1015288048851882115> p!h or p!help', value: 'Displays this message' },
@@ -22,10 +23,9 @@ const credits = new EmbedBuilder()
             .setTitle('About')
             .setThumbnail('https://preview.redd.it/kt3311mn5bp01.png?auto=webp&s=e420455ca8880f533a66514151a197f0f89adce6')
             .addFields(
-                { name: 'Bot Info', value: 'A bot to look up employees\' information\n**Creator:** nepnep\n**Data provided by:** [Prydwen](https://prydwen.co)\n**Inspired by Hifumin Bot**', inline: true},
-                { name: 'Contact Info', value: '**Discord username:**\nnepnep#1358\n\nCan\'t believe I made this as a final project for my course', inline: true}
-            )
-
+                { name: 'Bot Info', value: 'A bot to look up an employee\'s profile from the game Counter:Side\n**Creator:** nepnep\n**Data provided by:** [Prydwen](https://prydwen.co)\n**Inspired by Hifumin Bot**', inline: true},
+                { name: 'Contact Info', value: `**Discord username:**\nnepnep#1358\n**Help me pay my tuition fee:**\nhttps://www.paypal.com/paypalme/hebuba?country.x=SE&locale.x=en_US`, inline: true}
+            );
 
 
 // Export functions
