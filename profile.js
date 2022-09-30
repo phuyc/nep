@@ -1,8 +1,6 @@
 const Discord = require("discord.js");
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 const fetch = require("node-fetch");
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
 const stringSimilarity = require("string-similarity")
 
 // Object to use instead of if...else/switch
@@ -27,13 +25,13 @@ const TYPES = {
 }
 
 const RATINGS = {
-    "D": "<:D_:1009868758908674108>",
-    "C": "<:C_:1009868756752797717>",
-    "B": "<:B_:1009868754831822920>",
-    "A": "<:A_:1009868760603164796>",
-    "S": "<:S_:1009868791548760205>",
-    "SS": "<:SS:1009868793016750192>",
-    "SSS": "<:SSS:1009868795243929600>"
+    "D": "<:D_:1024285330217640038>",
+    "C": "<:C_:1024285328246313041>",
+    "B": "<:B_:1024285326270808094>",
+    "A": "<:A_:1024285324345622529>",
+    "S": "<:S_:1024285317643108383>",
+    "SS": "<:SS:1024285320268746762>",
+    "SSS": "<:SSS:1024285322433015858>"
 }
 
 const REARMS = {
@@ -54,13 +52,14 @@ const REARMS = {
 }
 
 // Declare variables
-let res, json, skillEmbed, ten = '';
+let res, json, skillEmbed, ten = '', opres, opjson;
 
 
 // Is rearm
 function rearmSlug(name) {
     return REARMS[name] ?? name;
 }
+
 
 async function createProfileEmbed(name) {
 
@@ -72,9 +71,7 @@ async function createProfileEmbed(name) {
     res = await fetch(`https://www.prydwen.co/page-data/employees/${name.trim().replace(/ /g, "-").toLowerCase()}/page-data.json`);
 
     // Handle error
-    if (res.status != 200) {
-        return;
-    }
+    if (res.status != 200) return;
 
     // JSON
     json = await res.json();
@@ -135,13 +132,18 @@ async function createProfileEmbed(name) {
         skillEmbed += `\n\`\`\`${base[i].description.description}\`\`\``;
 
         // Add level 5
-        skillEmbed += `\`\`\`At level 5: ${five[i].description.description}\`\`\``;
+        if (i) {
+            skillEmbed += `\`At level 5: ${five[i].description.description}\``;
 
         // Add level 10
-        if (json.isRearmed) {
-            if (ten.length > i) {
-                skillEmbed += `\`\`\`At level 10: ${ten[i].description.description}\`\`\``;
-        }}
+            if (json.isRearmed) {
+                if (ten.length > i) {
+                    skillEmbed += `\n\`At level 10: ${ten[i].description.description}\``;
+            }}};
+        
+        if (i == base.length - 1) {
+            skillEmbed += '\n';
+        }
 
         // Create embed field 3.i (Skills)
         if (i==0) {
@@ -158,7 +160,7 @@ async function createProfileEmbed(name) {
     if (json.gearRecommendation) {
         profile.addFields(
             { name: "GEAR RECOMMENDATION", value: `PVE: \`${json.gearRecommendation.pve.set}\`\nPVP: \`${json.gearRecommendation.pvp.set}\`
-            \n**[Find out more](https://prydwen.co/${name.trim().replace(/ /g, "-").toLowerCase()})**`});
+            \n**[Find out more](https://prydwen.co/employees/${name.trim().replace(/ /g, "-").toLowerCase()})**`});
     }
 
     // Timestamp
@@ -172,8 +174,39 @@ async function createProfileEmbed(name) {
 }
 
 
+// Operators
+async function createOperatorEmbed(name) {
+    // Fetch and JSON-ify
+    opres = await fetch(`https://www.prydwen.co/page-data/operators/${name.trim().replace(/ /g, "-").toLowerCase()}/page-data.json`);
+    if (opres.status != 200) return;
+    opjson = await opres.json();
+    opjson = opjson.result.data.currentUnit.nodes[0];
+
+    // Basically the same thing as profile
+    let operator = new EmbedBuilder()
+    .setTitle(`[${opjson.rarity}] ${opjson.fullName}`)
+    .setDescription(`#${opjson.unitId}`)
+    .setThumbnail(`https://prydwen.co${opjson.smallAvatar.localFile.childImageSharp.gatsbyImageData.images.fallback.src}`)
+    .setColor(0x0099FF)
+    .addFields(
+        // STATS
+        {name: "STATS (LVL100)", value: `Ship's HP: +${opjson.operatorHp}%\nShip's ATK: +${opjson.operatorAtk}%`, inline: true},
+        {name: "\u200b", value: `Ship's DEF: +${opjson.operatorDef}%\nShip's CDR: +${opjson.operatorHaste}%`, inline: true},
+
+        // RATINGS
+        {name: "RATINGS", value: `PVE: ${RATINGS[opjson.pveScore] ?? opjson.pveScore} PVP: ${RATINGS[opjson.pvpScore] ?? opjson.pvpScore}`},
+
+        // SKill
+        {name: opjson.operatorSkill.name, value: `**Skill trigger order: ${opjson.triggerOrder}**\n**At level 1:**\n\`\`\`${opjson.operatorSkill.description}\`\`\`\n**At level 8:**\n\`\`\`${opjson.operatorSkill.description_8}\`\`\``}
+    )
+
+    return operator;
+}
+
+
+
 // Suggest
-function suggest(name, db) {
+function suggest(name, db, type) {
 
     // Capitalize name
     if (typeof(name) != 'string') return;
@@ -184,7 +217,7 @@ function suggest(name, db) {
     const names = [];
 
     // Populate array
-    let aliases = db.prepare("SELECT name FROM employees;").all();
+    let aliases = db.prepare(`SELECT name FROM ${type}s;`).all();
     for (let alias of aliases) {
         names.push(alias['name']);
     };
@@ -205,12 +238,12 @@ function suggest(name, db) {
 }
 
 
-function suggestMessage(name, db) {
+function suggestMessage(name, db, type) {
     // Get suggestions
-    let matches = suggest(name, db);
+    let matches = suggest(name, db, type);
 
     // Create components for suggestion message
-    let suggestion = `Did you mean:\n1. ${matches[0].target}\n2. ${matches[1].target}\n3. ${matches[2].target}`;
+    let suggestion = `Did you mean this ${type}:\n1. ${matches[0].target}\n2. ${matches[1].target}\n3. ${matches[2].target}`;
     let row = new ActionRowBuilder()
     .addComponents(
         // 1
@@ -236,14 +269,14 @@ function suggestMessage(name, db) {
 
 
 // Get slug
-function getSlug(name, db) {
-    let slug = db.prepare("SELECT slug FROM employees WHERE name=?;").get(name);
+function getSlug(name, db, type) {
+    let slug = db.prepare(`SELECT slug FROM ${type}s WHERE name=?;`).get(name);
     
     // Return slug if found and the default if not found
-    return slug['slug'] ?? name.trim().replace(" ", "-").toLowerCase();
+    return slug ?? name.trim().replace(" ", "-").toLowerCase();
 }
 
 
 
 // Export
-module.exports = { createProfileEmbed, suggestMessage, getSlug, rearmSlug };
+module.exports = { createProfileEmbed, suggestMessage, getSlug, rearmSlug, createOperatorEmbed };
