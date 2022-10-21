@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, Embed } = require('discord.js');
 
 // Help
 const help = new EmbedBuilder()
@@ -19,15 +19,33 @@ const help = new EmbedBuilder()
         .setFooter({ text: 'nepnep#1358', iconURL: 'https://store.playstation.com/store/api/chihiro/00_09_000/container/BE/nl/19/EP0031-CUSA03124_00-AV00000000000037/image?w=320&h=320&bg_color=000000&opacity=100&_version=00_09_000' });
 
 const credits = new EmbedBuilder()
-            .setColor(0xAE21E8)
-            .setTitle('About')
-            .setThumbnail('https://preview.redd.it/kt3311mn5bp01.png?auto=webp&s=e420455ca8880f533a66514151a197f0f89adce6')
-            .addFields(
-                { name: 'Bot Info', value: 'A bot to look up an employee\'s profile from the game Counter:Side\n**Creator:** nepnep\n**Data provided by:** [Prydwen](https://prydwen.co)\n**Inspired by Hifumin Bot**', inline: true},
-                { name: 'Contact Info', value: `**Discord username:**\nnepnep#1358\n**Help me pay my tuition fee:**\nhttps://www.paypal.com/paypalme/hebuba?country.x=SE&locale.x=en_US`, inline: true}
+        .setColor(0xAE21E8)
+        .setTitle('About')
+        .setThumbnail('https://preview.redd.it/kt3311mn5bp01.png?auto=webp&s=e420455ca8880f533a66514151a197f0f89adce6')
+        .addFields(
+                { name: 'Bot Info', value: 'A bot to look up various information from the game Counter:Side\n**Creator:** nepnep\n**Data provided by:** [Prydwen](https://prydwen.gg)\n**Inspired by Hifumin Bot**', inline: true},
+                { name: 'Contact Info', value: `**Discord username:**\nnepnep#1358\n**Join our Discord:** [discord.gg/prydwen](https://discord.gg/prydwen) `, inline: true}
             );
 
+const noSkin = new EmbedBuilder()
+        .setColor(0xDC3545)
+        .addFields({ name: 'OOPS', value: "This employee doesn't have any skin (for now)" });
 
+const profileUsage = new EmbedBuilder()
+        .setColor(0xAE21E8)
+        .addFields({ name: 'p!profile <name of employee> || p!p <name of employee>', value: 'Look up the profile of an employee, including ratings, skill details and gear recommendation. Add **a.** and **r.** in front to show awakeneds and rearmeds'});
+
+const operatorUsage = new EmbedBuilder()
+        .setColor(0xAE21E8)
+        .addFields({ name: 'p!operator <name of operator> || p!o <name of operator>', value: 'Look up the profile of an operator, including ratings and skill details at lvl 1 and 8'});
+
+const skinUsage = new EmbedBuilder()
+        .setColor(0xAE21E8)
+        .addFields({ name: 'p!skin <name of employee>', value: 'Look up the skins of an employee. The returned embeds will have an up time of 15 minutes. After that, you will have to use p!skin to search for it again'});
+
+const shipUsage = new EmbedBuilder()
+        .setColor(0xAE21E8)
+        .addFields({ name: 'p!ship <name of ship>', value: 'Look up the ratings and skills of a ship'});
 // Export functions
-module.exports = { help, credits };
+module.exports = { help, credits, noSkin, profileUsage, operatorUsage, skinUsage, shipUsage };
 
