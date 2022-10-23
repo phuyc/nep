@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 const fetch = require("node-fetch");
-const stringSimilarity = require("string-similarity")
+const stringSimilarity = require("string-similarity");
 
 // Object to use instead of if...else/switch
 const ROLES = {
@@ -51,8 +51,12 @@ const REARMS = {
     'r.titan':  'triana-titan',
 }
 
+const colors = [0xED343E, 0x009EEC, 0xC267EC];
+
 // Declare variables
-let res, json, skillEmbed, ten = '', opres, opjson, list = [], skinjson, names = [], skinImages = [], shipjson, shipres, shipSkillEmbed;
+let res, json, skillEmbed, ten = '', opres, opjson, skinjson, names = [], skinImages = [], shipjson, shipres, shipSkillEmbed, skinActionRow, skins, skinEmbeds = [], srcSet;
+
+
 
 
 // Is rearm
@@ -72,6 +76,8 @@ function rearmAndAwakenedSlug(name) {
 
     return name;
 }
+
+
 
 
 async function createProfileEmbed(name) {
@@ -114,9 +120,9 @@ async function createProfileEmbed(name) {
     // Create embed
     let profile = new EmbedBuilder()
     .setTitle(`[${json.rarity}] ${json.fullName}`)
-    .setDescription(`#${json.unitId}`)
+    .setDescription(`[Check out our detail ratings and reviews](https://www.prydwen.gg/counter-side/characters/${name.trim().replace(/ /g, "-").toLowerCase()})`)
     .setThumbnail(`https://prydwen.gg${json.smallAvatar.localFile.childImageSharp.gatsbyImageData.images.fallback.src}`)
-    .setColor(0x0099FF)
+    .setColor(getRandomColor(colors))
     .addFields(
 
         // Field 1.1 (Details left)
@@ -178,14 +184,10 @@ async function createProfileEmbed(name) {
     }
 
     // Create embed field 4 (Gear rec)
-    if (json.gearRecommendation) {
-        profile.addFields(
-            { name: "GEAR RECOMMENDATION", value: `PVE: \`${json.gearRecommendation.pve.set}\`\nPVP: \`${json.gearRecommendation.pvp.set}\`
-            \n**[Check out our detail ratings and review here](https://prydwen.gg/counter-side/characters/${name.trim().replace(/ /g, "-").toLowerCase()})**`});
-    }
+    if (json.gearRecommendation) profile.addFields({ name: "GEAR RECOMMENDATION", value: `PVE: \`${json.gearRecommendation.pve.set}\`\nPVP: \`${json.gearRecommendation.pvp.set}\``})
 
     // Timestamp
-    profile.setTimestamp()
+    .setTimestamp()
 
     // Footer
     .setFooter({ text: 'nepnep#1358', iconURL: 'https://store.playstation.com/store/api/chihiro/00_09_000/container/BE/nl/19/EP0031-CUSA03124_00-AV00000000000037/image?w=320&h=320&bg_color=000000&opacity=100&_version=00_09_000' });
@@ -193,6 +195,8 @@ async function createProfileEmbed(name) {
     // Return
     return profile;
 }
+
+
 
 
 // Operators
@@ -206,9 +210,9 @@ async function createOperatorEmbed(name) {
     // Basically the same thing as profile
     let operator = new EmbedBuilder()
     .setTitle(`[${opjson.rarity}] ${opjson.fullName}`)
-    .setDescription(`#${opjson.unitId}`)
+    .setDescription(`[Check out our detail ratings and reviews](https://www.prydwen.gg/counter-side/operators/${name.trim().replace(/ /g, "-").toLowerCase()})`)
     .setThumbnail(`https://prydwen.gg${opjson.smallAvatar.localFile.childImageSharp.gatsbyImageData.images.fallback.src}`)
-    .setColor(0x0099FF)
+    .setColor(getRandomColor(colors))
     .addFields(
         // STATS
         {name: "STATS (LVL100)", value: `Ship's HP: +${opjson.operatorHp}%\nShip's ATK: +${opjson.operatorAtk}%`, inline: true},
@@ -223,6 +227,7 @@ async function createOperatorEmbed(name) {
 
     return operator;
 }
+
 
 
 
@@ -259,6 +264,8 @@ function suggest(name, db, type) {
     // Return
     return matches;
 }
+
+
 
 
 function suggestMessage(name, db, type) {
@@ -303,8 +310,10 @@ function getSlug(name, db, type) {
     return slug ?? name.trim().replace(" ", "-").toLowerCase();
 }
 
-async function createSkinEmbed(name) {
 
+
+
+async function createSkinEmbed(name) {
     // Check for Awakened or Rearm
     name = rearmAndAwakenedSlug(name);
 
@@ -317,8 +326,6 @@ async function createSkinEmbed(name) {
     // JSONify
     skinjson = await res.json();
     skinjson = skinjson.result.data.currentUnit.nodes[0];
-
-    let skins;
 
     // Check for rearm
     if (skinjson.isRearmed) {
@@ -336,17 +343,23 @@ async function createSkinEmbed(name) {
 
     for (let i = 0; i < skins.length; i++) {
         names.push(skins[i].name);
+        // TODO: 
+        // Search for the path to the largest webp, which contains 029bb
+        //skinImages.push(/\b.*029bb.*\s/i.exec(skins[i].fullImage.localFile.childImageSharp.gatsbyImageData.images.sources[0].srcSet));
+        names.push(skins[i].name);
         skinImages.push(skins[i].fullImage.localFile.childImageSharp.gatsbyImageData.images.fallback.src);
     }
 
     // Create message components
-    let skinActionRow = new ActionRowBuilder()
-    let skinEmbeds = [];
-
+    if (skins.length != 1) {
+        skinActionRow = new ActionRowBuilder()
+    }
+    skinEmbeds = [];
+    
     for (let i = 0; i < skins.length; i++) {
 
         let skinEmbed = new EmbedBuilder()
-        .setColor(0x0099FF)
+        .setColor(getRandomColor(colors))
         .setTitle(names[i])
         .setImage(`https://prydwen.gg${skinImages[i]}`)
         .setTimestamp()
@@ -354,13 +367,15 @@ async function createSkinEmbed(name) {
 
         skinEmbeds.push(skinEmbed);
 
-        skinActionRow.addComponents(
-            new ButtonBuilder()
-            .setCustomId(`skin${i}`)
-            .setLabel(`Skin ${i + 1}`)
-            .setStyle(ButtonStyle.Primary)
-        );
+        if (skins.length != 1) {
+            skinActionRow.addComponents(
+                new ButtonBuilder()
+                .setCustomId(`skin${i}`)
+                .setLabel(`Skin ${i + 1}`)
+                .setStyle(ButtonStyle.Primary)
+        )};
     }
+
     return { embeds: skinEmbeds,
              actionRow: skinActionRow
         };
@@ -381,9 +396,10 @@ async function createShipEmbed(name) {
 
     
     let ship = new EmbedBuilder()
-    .setColor(0x0099FF)
+    .setColor(getRandomColor(colors))
         .setTitle(`[${shipjson.rarity}] ${shipjson.fullName}`)
         .setThumbnail(`https://prydwen.gg${shipjson.smallAvatar.localFile.childImageSharp.gatsbyImageData.images.fallback.src}`)
+        .setDescription(`[Check out our detail ratings and reviews](https://www.prydwen.gg/counter-side/ships/${name.trim().replace(/ /g, "-").toLowerCase()})`)
         .setTimestamp()
         .setFooter({ text: 'nepnep#1358', iconURL: 'https://store.playstation.com/store/api/chihiro/00_09_000/container/BE/nl/19/EP0031-CUSA03124_00-AV00000000000037/image?w=320&h=320&bg_color=000000&opacity=100&_version=00_09_000' })
         .addFields({ name: 'RATINGS', value: `PVE: ${RATINGS[shipjson.pveScore]} PVP: ${RATINGS[shipjson.pvpScore]}`});
@@ -418,13 +434,18 @@ async function createShipEmbed(name) {
                 } else {
                     ship.addFields({ name: '\u200b', value: shipSkillEmbed });
                 }
-
                 shipSkillEmbed = '';
             }
-
 
         return ship;
 }
 
+
+
+
+function getRandomColor(colours) {
+    return colours[Math.floor(Math.random() * colours.length)];
+}
+
 // Export
-module.exports = { createProfileEmbed, suggestMessage, getSlug, createOperatorEmbed, createSkinEmbed, createShipEmbed };
+module.exports = { createProfileEmbed, suggestMessage, getSlug, createOperatorEmbed, createSkinEmbed, createShipEmbed, getRandomColor };
