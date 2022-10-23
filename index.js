@@ -1,16 +1,14 @@
 const Discord = require("discord.js")
 const keepAlive = require("./server")
-const { help, credits, noSkin, profileUsage, operatorUsage, skinUsage, shipUsage } = require("./embeds")
-const { createProfileEmbed, createOperatorEmbed, suggestMessage, getSlug, createSkinEmbed, createShipEmbed } = require("./profile")
+const { help, credits, noSkin, profileUsage, operatorUsage, skinUsage, shipUsage, colors } = require("./embeds")
+const { createProfileEmbed, createOperatorEmbed, suggestMessage, getSlug, createSkinEmbed, createShipEmbed, getRandomColor } = require("./profile")
 const Database = require("better-sqlite3");
 const { ActivityType } = require("discord.js");
 const autoUpdate = require("./update");
 var Mutex = require('async-mutex').Mutex;
 
 /*
-TODO: Add guide if there's no argument for commands
-      Add a command that search for ships (p!ship)
-      Add a command that show lists of employees, operators, skins, ships (p!list)
+TODO: Add a command that show lists of employees, operators, skins, ships (p!list)
       Add small QOL (p!operator, p!profile)
  */
 
@@ -18,7 +16,7 @@ TODO: Add guide if there's no argument for commands
 const mutex = new Mutex();
 
 // Declare variables
-let name, embed, suggests, message, profile, wait, messages, slug, type, skin, index, ship;
+let name, embed, suggests, message, profile, wait, messages, slug, type, skin, index, ship, caseInsensitive;
 const timeout = {};
 let prefix = 'p!';
 
@@ -48,15 +46,16 @@ client.once("ready", () => {
 //Check messages
 client.on("messageCreate", async msg => {
     if (msg.author.id == '977387486655414412') return;
-    if (!msg.content.startsWith(prefix)) return;
+    if (!msg.content.trim().toLowerCase().startsWith(prefix)) return;
 
+    caseInsensitive = msg.content.trim().toLowerCase();
     // For static commands
-    switch (msg.content) {
+    switch (caseInsensitive) {
 
         // Help
         case prefix + "help":
         case prefix + 'h':
-            msg.channel.send({ embeds: [help] });
+            msg.channel.send({ embeds: [help.setColor(getRandomColor(colors))] });
             break;
 
         // Ping (https://stackoverflow.com/questions/63411268/discord-js-ping-command)
@@ -70,7 +69,7 @@ client.on("messageCreate", async msg => {
         // Credits
         case prefix + 'i':
         case prefix + 'info':
-            msg.channel.send({ embeds: [credits] });
+            msg.channel.send({ embeds: [credits.setColor(getRandomColor(colors))] });
             break;
     
         // Stat
@@ -81,33 +80,33 @@ client.on("messageCreate", async msg => {
         // Profile (Usage)
         case prefix + 'p':
         case prefix + 'profile':
-            msg.channel.send({ embeds: [profileUsage]});
+            msg.channel.send({ embeds: [profileUsage.setColor(getRandomColor(colors))]});
             break;
 
         // Operator (Usage)
         case prefix + 'o':
         case prefix + 'operator':
-            msg.channel.send({ embeds: [operatorUsage] });
+            msg.channel.send({ embeds: [operatorUsage.setColor(getRandomColor(colors))] });
             break;
 
         // Skin (Usage)
         case prefix + 'skin':
-            msg.channel.send({ embeds: [skinUsage] });
+            msg.channel.send({ embeds: [skinUsage.setColor(getRandomColor(colors))] });
             break;
         case prefix + 'ship':
-            msg.channel.send({ embeds: [shipUsage]});
+            msg.channel.send({ embeds: [shipUsage.setColor(getRandomColor(colors))]});
             break;
     };
 
 
     // p!p
-    if (/^\bp!p\b.+/i.exec(msg.content.trim()) || /^\bp!profile\b.+/i.exec(msg.content.trim())) {
+    if (/^\bp!p\b.+/i.exec(caseInsensitive) || /^\bp!profile\b.+/i.exec(caseInsensitive)) {
 
         // Lock
         await mutex.runExclusive(async () => {
 
             // Get name
-            if (msg.content.startsWith('p!p')) name = msg.content.slice(4);
+            if (msg.content.toLowerCase().startsWith('p!p')) name = msg.content.slice(4);
             if (msg.content.startsWith('p!profile')) name = msg.content.slice(10);            
 
             // Send wait
@@ -135,8 +134,9 @@ client.on("messageCreate", async msg => {
         });
     };
 
+
     // p!o
-    if (/^\bp!o\b.+/i.exec(msg.content.trim()) || /^\bp!operator\b.+/i.exec(msg.content.trim())) {
+    if (/^\bp!o\b.+/i.exec(caseInsensitive) || /^\bp!operator\b.+/i.exec(caseInsensitive)) {
         
         await mutex.runExclusive(async () => {
             
@@ -170,8 +170,9 @@ client.on("messageCreate", async msg => {
         })
     };
     
+
     // p!skin
-    if (/^\bp!skin\b.+/i.exec(msg.content.trim())) {
+    if (/^\bp!skin\b.+/i.exec(caseInsensitive)) {
 
         await mutex.runExclusive(async () => {
 
@@ -203,9 +204,16 @@ client.on("messageCreate", async msg => {
                 return;
             }
 
+            // Found employee has 1 skin
+            if (!skin.actionRow) {
+                msg.channel.send({ embeds: [skin.embeds[0]] });
+                wait.delete();
+                return;
+            }
+            
             msg.channel.send({
-                 embeds: [skin.embeds[0]],
-                 components: [skin.actionRow]
+                embeds: [skin.embeds[0]],
+                components: [skin.actionRow]
             })
             // Save the skins and actionRow for further uses for 15 minutes
             .then( sent => {timeout[sent.id] = skin;
@@ -216,8 +224,9 @@ client.on("messageCreate", async msg => {
             wait.delete();
     })}
 
+
     // p!ship
-    if (/^\bp!ship\b.+/i.exec(msg.content.trim())) {
+    if (/^\bp!ship\b.+/i.exec(caseInsensitive)) {
 
         await mutex.runExclusive(async () => {
 
@@ -229,7 +238,7 @@ client.on("messageCreate", async msg => {
             // Create and send profile ship if found
             ship = await createShipEmbed(name);
             
-            // TODO: Send suggest if can't find employee
+            // Send suggest if can't find employee
             if (!ship) {
                 suggests = suggestMessage(name, db, "ship");
                 msg.channel.send({
@@ -247,6 +256,19 @@ client.on("messageCreate", async msg => {
             // Delete wait
             wait.delete();
         })}
+
+    // TODO:
+    if (/^\bp!list\b.+/i.exec(caseInsensitive)) {
+        // Invalid arguments
+        return;
+        if (!['employee', 'operator', 'ship', 'skin'].includes(msg.content.slice(7).trim)) {
+            // TODO: Return Usage embed
+        }
+
+        // TODO: Code p!list
+
+    }
+
 });
 
 
