@@ -239,6 +239,8 @@ function suggest(name, db, type) {
     
     name = name.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
 
+    name = rearmAndAwakenedSlug(name);
+
     // Array of employees' name
     const names = [];
 
