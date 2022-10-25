@@ -11,7 +11,7 @@ const help = new EmbedBuilder()
             { name: '<:yuna_stare:1015286941761151067> p!p', value: 'Looks up an employee\'s profile (add **a.** and **r.** at the start for Awakeneds and Rearms). **Example: p!p a.shin jia**' },
             { name: '<:momo:1024286695211933766> p!o', value: 'Same thing but operator'},
             { name: '<:hildeproud:1033226597693665380> p!ship', value: 'Same thing but ship'},
-            { name: '<:yumpeko:1033225443618332692> p!s', value: 'Displays employee\'s skin (default excluded)' },
+            { name: '<:yumpeko:1033225443618332692> p!skin', value: 'Displays employee\'s skin (default excluded)' },
             { name: 'P!list (coming soon)', value: 'Displays lists of employees, operators, ships or skins'},
             { name: '🏓 p!ping', value: 'Return latency.' },
             { name: '<:xiao_lin:1015288048851882115> p!h or p!help', value: 'Displays this message' },
