@@ -1,7 +1,7 @@
 const Discord = require("discord.js")
 const keepAlive = require("./server")
 const { help, credits, noSkin, profileUsage, operatorUsage, skinUsage, shipUsage, colors } = require("./embeds")
-const { createProfileEmbed, createOperatorEmbed, suggestMessage, getSlug, createSkinEmbed, createShipEmbed, getRandomColor } = require("./profile")
+const { createProfileEmbed, createOperatorEmbed, suggestMessage, getSlug, createSkinEmbed, createShipEmbed, getRandomColor, rearmAndAwakenedSlug } = require("./profile")
 const Database = require("better-sqlite3");
 const { ActivityType } = require("discord.js");
 const autoUpdate = require("./update");
@@ -211,6 +211,7 @@ client.on("messageCreate", async msg => {
                 return;
             }
             
+            // Found employee has multiple skins
             msg.channel.send({
                 embeds: [skin.embeds[0]],
                 components: [skin.actionRow]
@@ -323,6 +324,13 @@ client.on('interactionCreate', async interaction => {
                     // Found employee has no skin
                     if (profile === 2) {
                         interaction.channel.send({ embeds: [noSkin] });
+                        wait.delete();
+                        return;
+                    }
+
+                    // Found employee has 1 skin
+                    if (!profile.actionRow) {
+                        interaction.channel.send({ embeds: [profile.embeds[0]] });
                         wait.delete();
                         return;
                     }
