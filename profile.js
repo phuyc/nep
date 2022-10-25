@@ -54,7 +54,7 @@ const REARMS = {
 const colors = [0xED343E, 0x009EEC, 0xC267EC];
 
 // Declare variables
-let res, json, skillEmbed, ten = '', opres, opjson, skinjson, names = [], skinImages = [], shipjson, shipres, shipSkillEmbed, skinActionRow, skins, skinEmbeds = [], srcSet;
+let res, json, skillEmbed, ten = '', opres, opjson, skinjson, names = [], skinImages = [], shipjson, shipres, shipSkillEmbed, skins, skinEmbeds = [];
 
 
 
@@ -62,17 +62,17 @@ let res, json, skillEmbed, ten = '', opres, opjson, skinjson, names = [], skinIm
 // Is rearm
 function rearmAndAwakenedSlug(name) {
     // Awakened or Rearmed
-    ar = name.slice(0, 2).toLowerCase();
+    ar = name.slice(0, 2).toLowerCase().trim();
 
     // Check for awakened
     if (ar === 'a.') {
         name = 'Awakened ' + name.slice(2);
-    };
+    }
 
     // Check for rearms
-    if (ar === 'r.') {
+    else if (ar === 'r.') {
         name = REARMS[name] ?? name;
-    }
+    };
 
     return name;
 }
@@ -351,11 +351,13 @@ async function createSkinEmbed(name) {
     }
 
     // Create message components
-    if (skins.length != 1) {
-        skinActionRow = new ActionRowBuilder()
-    }
+    let skinActionRow;
     skinEmbeds = [];
     
+    if (skins.length != 1) {
+        skinActionRow = new ActionRowBuilder();
+    }
+
     for (let i = 0; i < skins.length; i++) {
 
         let skinEmbed = new EmbedBuilder()
@@ -448,4 +450,4 @@ function getRandomColor(colours) {
 }
 
 // Export
-module.exports = { createProfileEmbed, suggestMessage, getSlug, createOperatorEmbed, createSkinEmbed, createShipEmbed, getRandomColor };
+module.exports = { createProfileEmbed, suggestMessage, getSlug, createOperatorEmbed, createSkinEmbed, createShipEmbed, getRandomColor, rearmAndAwakenedSlug };
