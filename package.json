@@ -1,10 +1,10 @@
 {
   "name": "cool",
   "version": "1.0.0",
-  "main": "prydwen.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
@@ -20,11 +20,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/phuyc/noti-llar.git"
+    "url": "git+https://github.com/phuyc/nep.git"
   },
   "bugs": {
-    "url": "https://github.com/phuyc/noti-llar/issues"
+    "url": "https://github.com/phuyc/nep/issues"
   },
-  "homepage": "https://github.com/phuyc/noti-llar#readme",
+  "homepage": "https://github.com/phuyc/nep#readme",
   "description": ""
 }
