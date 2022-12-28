@@ -47,4 +47,4 @@ setInterval(async () => {
 	} catch (error) {
 		console.error(error);	
 	}
-}, 180000);
+}, 1800000);
