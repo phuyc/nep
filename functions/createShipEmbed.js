@@ -26,7 +26,7 @@ async function createShipEmbed(name) {
         .addFields({ name: 'RATINGS', value: `PVE: ${RATINGS[shipjson.pveScore]} PVP: ${RATINGS[shipjson.pvpScore]}`});
         
         let shipSKills = shipjson.skills;
-        let shipSkillEmbed;
+        let shipSkillEmbed = '';
 
         // Create skill field for every skillBox
             for (let i = 0; i < shipSKills.length; i++) {
