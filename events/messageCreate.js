@@ -8,7 +8,7 @@ module.exports = {
             return;
         }
         if (msg.content.trim().toLowerCase().startsWith('p!')) {
-            msg.reply('Nep has switch to slash command. Please use /help to get the list of commands.')
+            msg.reply('Nep has switched to slash command. Please re-invite nep to the server and use /help for the list of commands.')
         }
     }
 }
