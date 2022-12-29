@@ -4,7 +4,6 @@ module.exports = {
     name: Events.MessageCreate,
     async execute(msg) {
         if (!msg.guild.members.me.permissionsIn(msg.channel).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.UseExternalEmojis])) {
-            await msg.reply("nep does not have permission to send messages here.");
             return;
         }
         if (msg.content.trim().toLowerCase().startsWith('p!')) {
