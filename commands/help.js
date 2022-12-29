@@ -6,7 +6,7 @@ const help = new EmbedBuilder()
         .setDescription('/help')
         .setThumbnail('https://img-10.stickers.cloud/packs/977bc206-85d3-4882-bd71-a8ab12956a4e/webp/c8bf8419-c2e4-4810-ab71-862dfb67614e.webp')
         .addFields(
-            { name: '<:yuna_stare:1015286941761151067> /employee', value: 'Looks up an employee\'s profile (add **a.** and **r.** at the start for Awakeneds and Rearms). **Example: p!p a.shin jia**' },
+            { name: '<:yuna_stare:1015286941761151067> /employee', value: 'Looks up an employee\'s profile (add **a.** and **r.** at the start for Awakeneds and Rearms). **Example: /employee a.shin jia**' },
             { name: '<:momo:1024286695211933766> /operator', value: 'Same thing but operator'},
             { name: '<:hildeproud:1033226597693665380> /ship', value: 'Same thing but ship'},
             { name: '<:yumpeko:1033225443618332692> /skin', value: 'Displays employee\'s skin (default excluded)' },
