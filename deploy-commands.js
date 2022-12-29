@@ -3,7 +3,7 @@ const fs = require('node:fs');
 
 require("dotenv").config()
 
-const clientId = "1044237038532169798";
+const clientId = "977387486655414412";
 
 const guildId = '960922300276953099';
 
@@ -18,7 +18,7 @@ for (const file of commandFiles) {
 }
 
 // Construct and prepare an instance of the REST module
-const rest = new REST({ version: '10' }).setToken(process.env.TEST);
+const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 // and deploy your commands!
 (async () => {
@@ -27,7 +27,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.TEST);
 
 		// The put method is used to fully refresh all commands in the guild with the current set
 		const data = await rest.put(
-			Routes.applicationGuildCommands(clientId, guildId),
+			Routes.applicationCommands(clientId),
 			{ body: commands },
 		);
 
