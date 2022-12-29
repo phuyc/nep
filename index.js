@@ -2,7 +2,7 @@ const { GatewayIntentBits } = require("discord.js");
 const Discord = require("discord.js")
 const fs = require('node:fs');
 const path = require('node:path');
-const { autoUpdate } = require("./functions/autoUpdate");
+const autoUpdate = require("./functions/autoUpdate");
 
 require("dotenv").config();
 
