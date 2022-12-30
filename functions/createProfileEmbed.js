@@ -86,7 +86,7 @@ async function createProfileEmbed(name) {
         skillEmbed += `\`At level 5: ${skill.level5.level5}\``;
 
         // Add level 10
-        if (json.isRearmed) {
+        if (skill.level10) {
             skillEmbed += `\n\`At level 10: ${skill.level10.level10}\``;      
         }
 
