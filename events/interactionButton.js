@@ -15,6 +15,7 @@ module.exports = {
     async execute(interaction) {
         // Check for permissions
         if (!interaction.isButton()) return;
+	if (!interaction.guild.members.me.permissionsIn(interaction.channel)) return;
         if (!interaction.guild.members.me.permissionsIn(interaction.channel).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.UseExternalEmojis])) {
             await interaction.reply("nep does not have permission to send messages here.");
             return;
