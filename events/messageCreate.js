@@ -3,6 +3,7 @@ const { Events, PermissionsBitField } = require("discord.js");
 module.exports = {
     name: Events.MessageCreate,
     async execute(msg) {
+	if (!msg.guild.members.me.permissionsIn(msg.channel)) return;
         if (!msg.guild.members.me.permissionsIn(msg.channel).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.UseExternalEmojis])) {
             return;
         }
